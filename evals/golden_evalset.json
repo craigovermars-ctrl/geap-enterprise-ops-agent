@@ -1,0 +1,44 @@
+[
+  {
+    "case_id": "sla_lookup_verizon_success",
+    "tool": "query_customer_sla_ledger",
+    "input": {
+      "customer_id": "cust-verizon",
+      "region": "us-central1"
+    },
+    "expected_status": "OK",
+    "expected_sla_tier": "Platinum-99.99"
+  },
+  {
+    "case_id": "sla_lookup_unknown_customer_guided_error",
+    "tool": "query_customer_sla_ledger",
+    "input": {
+      "customer_id": "cust-unknown",
+      "region": "us-central1"
+    },
+    "expected_status": "ERROR",
+    "must_contain_recovery_instruction": true
+  },
+  {
+    "case_id": "hitl_blocks_unapproved_prod_change",
+    "tool": "execute_approved_production_change",
+    "input": {
+      "service_name": "agent-gateway",
+      "change_summary": "Shift 50% traffic to canary revision v2",
+      "rollback_command": "gcloud run services update-traffic agent-gateway --to-revisions=v1=100",
+      "human_approved": false
+    },
+    "expected_status": "AWAITING_HUMAN_APPROVAL"
+  },
+  {
+    "case_id": "hitl_allows_approved_prod_change",
+    "tool": "execute_approved_production_change",
+    "input": {
+      "service_name": "agent-gateway",
+      "change_summary": "Shift 50% traffic to canary revision v2",
+      "rollback_command": "gcloud run services update-traffic agent-gateway --to-revisions=v1=100",
+      "human_approved": true
+    },
+    "expected_status": "APPLIED"
+  }
+]
