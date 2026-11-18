@@ -1,0 +1,19 @@
+steps:
+  - name: "python:3.11-slim"
+    id: "run-evals"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - "pip install -r requirements.txt && pytest -v"
+
+  - name: "hashicorp/terraform:1.7"
+    id: "terraform-apply"
+    dir: "terraform"
+    args: ["apply", "-auto-approve", "-var=project_id=${PROJECT_ID}", "-var=region=us-central1"]
+
+  - name: "python:3.11-slim"
+    id: "deploy-agent-engine"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - "pip install google-adk && adk deploy agent_engine --project=${PROJECT_ID} --region=us-central1 agent_app"
